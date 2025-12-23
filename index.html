@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>CyberAware | Sensibilisation Cybersécurité</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+
+  <!-- LOGIN -->
+  <section id="loginSection">
+    <h1>CyberAware</h1>
+    <p class="subtitle">Plateforme de sensibilisation à la cybersécurité</p>
+
+    <input type="email" id="email" placeholder="Adresse email" required>
+    <input type="password" id="password" placeholder="Mot de passe" required>
+    <button onclick="register()">S’inscrire / Se connecter</button>
+  </section>
+
+  <!-- CODE -->
+  <section id="codeSection" class="hidden">
+    <h2>Vérification</h2>
+    <p>Entrez le code de validation (simulation)</p>
+    <p class="code-demo">Code généré : <span id="generatedCode"></span></p>
+    <input type="text" id="codeInput" placeholder="Code">
+    <button onclick="verifyCode()">Valider</button>
+  </section>
+
+  <!-- DASHBOARD -->
+  <section id="dashboard" class="hidden">
+    <h2>Techniques d’attaques (approche défensive)</h2>
+
+    <div class="cards">
+      <div class="card">
+        <h3>Phishing</h3>
+        <p>
+          Le phishing repose sur l’imitation de services légitimes afin
+          d’inciter un utilisateur à divulguer des informations sensibles.
+        </p>
+      </div>
+
+      <div class="card">
+        <h3>Ingénierie sociale</h3>
+        <p>
+          Manipulation psychologique exploitant la peur, l’urgence ou l’autorité
+          pour provoquer une action non réfléchie.
+        </p>
+      </div>
+
+      <div class="card">
+        <h3>Fausses pages de connexion</h3>
+        <p>
+          Pages visuellement crédibles imitant des interfaces connues.
+          La prévention repose sur la vérification des URLs.
+        </p>
+      </div>
+
+      <div class="card">
+        <h3>Vol de session</h3>
+        <p>
+          Exploitation de sessions actives via des appareils compromis
+          ou des réseaux non sécurisés.
+        </p>
+      </div>
+    </div>
+
+    <h2>Contact</h2>
+
+    <form id="contactForm">
+      <input type="text" name="name" placeholder="Nom" required>
+      <input type="email" name="email" placeholder="Email" required>
+      <textarea name="message" placeholder="Message" required></textarea>
+
+      <input type="hidden" name="_captcha" value="false">
+
+      <button type="submit">Envoyer</button>
+    </form>
+
+    <p id="status"></p>
+
+    <p class="legal">
+      ⚠️ Site strictement éducatif – aucune méthode illégale n’est enseignée.
+    </p>
+  </section>
+
+</div>
+
+<script src="script.js"></script>
+
+<!-- SCRIPT FORMULAIRE (TON SCRIPT EXACT) -->
+<script>
+document.getElementById("contactForm").addEventListener("submit", function(e) {
+  e.preventDefault(); // empêche la redirection
+
+  const formData = new FormData(this);
+
+  fetch("https://formsubmit.co/ajax/tss.alex84@gmail.com", {
+    method: "POST",
+    body: formData
+  })
+  .then(response => response.json())
+  .then(data => {
+    document.getElementById("status").innerText = "Message envoyé avec succès ✅";
+    this.reset();
+  })
+  .catch(error => {
+    document.getElementById("status").innerText = "Erreur ❌";
+  });
+});
+</script>
+
+</body>
+</html>

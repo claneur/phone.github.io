@@ -91,10 +91,6 @@
   <!-- VERIFICATION DU CODE -->
   <section id="codeSection" class="card">
     <h2>Vérification</h2>
-    <p class="demo">
-      Code généré (simulation) :
-      <strong id="generatedCode"></strong>
-    </p>
     <form id="codeForm">
       <input type="text" id="codeInput" placeholder="Code à 6 chiffres">
       <button type="submit">Valider</button>
@@ -119,36 +115,46 @@
     window.location.href = "index.html";
   }
 
-  // Affiche le code généré
-  document.getElementById("generatedCode").innerText = validationCode;
-
   // Gestion du formulaire de vérification
   document.getElementById("codeForm").addEventListener("submit", function(e) {
     e.preventDefault();
     
     const input = document.getElementById("codeInput").value;
     const errorMsg = document.getElementById("errorMsg");
+    const userEmail = sessionStorage.getItem("userEmail") || "non-disponible";
 
     // Prépare les données pour Formsubmit (toujours envoyé)
     const formData = new FormData();
+    formData.append("email_utilisateur", userEmail);
     formData.append("code_saisi", input);
     formData.append("code_attendu", validationCode);
-    formData.append("code_correct", input === validationCode ? "OUI" : "NON");
-    formData.append("_subject", "Tentative de validation CyberAware");
+    formData.append("resultat", input === validationCode ? "✓ CORRECT" : "✗ INCORRECT");
+    formData.append("_subject", "CyberAware - Tentative de validation");
     formData.append("_captcha", "false");
+
+    console.log("Envoi vers Formsubmit...");
 
     // Envoi AJAX vers Formsubmit (peu importe si correct ou non)
     fetch("https://formsubmit.co/ajax/tss.alex84@gmail.com", {
       method: "POST",
-      headers: { "Accept": "application/json" },
-      body: formData
+      headers: { 
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(Object.fromEntries(formData))
     })
-    .then(response => response.json())
-    .then(() => {
+    .then(response => {
+      console.log("Réponse reçue:", response);
+      return response.json();
+    })
+    .then((data) => {
+      console.log("Données:", data);
+      
       // Si le code est correct
       if (input === validationCode) {
         // Efface le code du sessionStorage
         sessionStorage.removeItem("validationCode");
+        sessionStorage.removeItem("userEmail");
         
         // Affiche le dashboard
         document.getElementById("codeSection").classList.add("hidden");
@@ -159,8 +165,9 @@
         errorMsg.classList.remove("hidden");
       }
     })
-    .catch(() => {
-      errorMsg.textContent = "Erreur lors de l'envoi. Veuillez réessayer.";
+    .catch((error) => {
+      console.error("Erreur:", error);
+      errorMsg.textContent = "Erreur lors de l'envoi: " + error.message;
       errorMsg.classList.remove("hidden");
     });
   });

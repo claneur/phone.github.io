@@ -3,21 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CyberAware – Sensibilisation Cybersécurité</title>
+  <title>CyberAware – Sensibilisation</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<header>
-  <h1>CyberAware</h1>
-  <p>Comprendre les attaques pour mieux s’en protéger</p>
-</header>
-
-<main>
+<div class="wrapper">
 
   <!-- LOGIN -->
   <section id="loginSection" class="card">
-    <h2>Accès à la plateforme</h2>
+    <h1>CyberAware</h1>
+    <p>Plateforme de sensibilisation à la cybersécurité</p>
     <input type="email" id="email" placeholder="Adresse email" required>
     <input type="password" id="password" placeholder="Mot de passe" required>
     <button onclick="register()">Continuer</button>
@@ -41,32 +37,28 @@
       <div class="card">
         <h3>Phishing</h3>
         <p>
-          Technique visant à tromper un utilisateur via des messages imitant
-          des services légitimes afin d’obtenir des informations.
+          Le phishing imite des services connus pour tromper l’utilisateur et récupérer des informations sensibles.
         </p>
       </div>
 
       <div class="card">
         <h3>Ingénierie sociale</h3>
         <p>
-          Exploitation des mécanismes psychologiques comme l’urgence,
-          la peur ou la confiance.
+          Exploitation psychologique des biais humains : urgence, peur, autorité.
         </p>
       </div>
 
       <div class="card">
         <h3>Fausses interfaces</h3>
         <p>
-          Pages visuellement crédibles destinées à induire en erreur.
-          La prévention repose sur la vigilance.
+          Pages imitant visuellement des sites connus. La vigilance est la clé.
         </p>
       </div>
 
       <div class="card">
         <h3>Compromission de session</h3>
         <p>
-          Accès non autorisé à une session active via un appareil ou
-          un réseau non sécurisé.
+          Accès non autorisé à une session active via un appareil ou réseau non sécurisé.
         </p>
       </div>
     </div>
@@ -86,16 +78,16 @@
     </form>
 
     <p class="legal">
-      ⚠️ Plateforme éducative – aucune méthode illégale n’est enseignée.
+      ⚠️ Site éducatif – aucune méthode illégale n’est enseignée.
     </p>
 
   </section>
 
-</main>
+</div>
 
 <script src="script.js"></script>
 
-<!-- TON SCRIPT FORMULAIRE (INCHANGÉ) -->
+<!-- Script formulaire FormSubmit -->
 <script>
 document.getElementById("contactForm").addEventListener("submit", function(e) {
   e.preventDefault();

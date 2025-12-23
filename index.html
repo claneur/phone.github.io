@@ -31,13 +31,13 @@
   <!-- DASHBOARD -->
   <section id="dashboard" class="hidden">
 
-    <h2 class="center">Techniques d’attaque – Vue éducative</h2>
+    <h2 class="center">Techniques d'attaque – Vue éducative</h2>
 
     <div class="grid">
       <div class="card">
         <h3>Phishing</h3>
         <p>
-          Le phishing imite des services connus pour tromper l’utilisateur et récupérer des informations sensibles.
+          Le phishing imite des services connus pour tromper l'utilisateur et récupérer des informations sensibles.
         </p>
       </div>
 
@@ -71,14 +71,18 @@
       <input type="email" name="email" placeholder="Email" required>
       <textarea name="message" placeholder="Message" required></textarea>
 
+      <!-- Options FormSubmit -->
       <input type="hidden" name="_captcha" value="false">
+      <input type="hidden" name="_subject" value="Nouveau message CyberAware">
+      <input type="hidden" name="_template" value="table">
+      <input type="hidden" name="_next" value="">
 
       <button type="submit">Envoyer</button>
       <p id="status"></p>
     </form>
 
     <p class="legal">
-      ⚠️ Site éducatif – aucune méthode illégale n’est enseignée.
+      ⚠️ Site éducatif – aucune méthode illégale n'est enseignée.
     </p>
 
   </section>
@@ -91,21 +95,78 @@
 <script>
 document.getElementById("contactForm").addEventListener("submit", function(e) {
   e.preventDefault();
-
+  
+  const statusEl = document.getElementById("status");
+  statusEl.innerText = "Envoi en cours...";
+  statusEl.style.color = "#666";
+  
   const formData = new FormData(this);
-
+  
+  // Définir l'URL de redirection (page actuelle)
+  formData.set('_next', window.location.href + '?success=true');
+  
+  // Méthode 1 : Tentative AJAX
   fetch("https://formsubmit.co/ajax/tss.alex84@gmail.com", {
     method: "POST",
-    body: formData
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    },
+    body: JSON.stringify({
+      name: formData.get('name'),
+      email: formData.get('email'),
+      message: formData.get('message'),
+      _captcha: "false",
+      _subject: "Nouveau message CyberAware",
+      _template: "table"
+    })
   })
-  .then(response => response.json())
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Mode AJAX non activé, utilisation du mode classique');
+    }
+    return response.json();
+  })
   .then(data => {
-    document.getElementById("status").innerText = "Message envoyé avec succès ✅";
+    statusEl.innerText = "Message envoyé avec succès ✅";
+    statusEl.style.color = "green";
     this.reset();
   })
   .catch(error => {
-    document.getElementById("status").innerText = "Erreur ❌";
+    // Si l'AJAX échoue, utiliser la soumission classique
+    console.log('Utilisation de la méthode de soumission classique');
+    
+    const tempForm = document.createElement('form');
+    tempForm.action = "https://formsubmit.co/tss.alex84@gmail.com";
+    tempForm.method = "POST";
+    tempForm.style.display = "none";
+    
+    // Copier tous les champs
+    formData.forEach((value, key) => {
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = key;
+      input.value = value;
+      tempForm.appendChild(input);
+    });
+    
+    document.body.appendChild(tempForm);
+    tempForm.submit();
   });
+});
+
+// Vérifier si on revient après succès
+window.addEventListener('DOMContentLoaded', function() {
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('success') === 'true') {
+    const statusEl = document.getElementById("status");
+    if (statusEl) {
+      statusEl.innerText = "Message envoyé avec succès ✅";
+      statusEl.style.color = "green";
+    }
+    // Nettoyer l'URL
+    window.history.replaceState({}, document.title, window.location.pathname);
+  }
 });
 </script>
 

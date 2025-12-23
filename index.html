@@ -2,73 +2,79 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>CyberAware | Sensibilisation Cybersécurité</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CyberAware – Sensibilisation Cybersécurité</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div class="container">
+<header>
+  <h1>CyberAware</h1>
+  <p>Comprendre les attaques pour mieux s’en protéger</p>
+</header>
+
+<main>
 
   <!-- LOGIN -->
-  <section id="loginSection">
-    <h1>CyberAware</h1>
-    <p class="subtitle">Plateforme de sensibilisation à la cybersécurité</p>
-
+  <section id="loginSection" class="card">
+    <h2>Accès à la plateforme</h2>
     <input type="email" id="email" placeholder="Adresse email" required>
     <input type="password" id="password" placeholder="Mot de passe" required>
-    <button onclick="register()">S’inscrire / Se connecter</button>
+    <button onclick="register()">Continuer</button>
   </section>
 
   <!-- CODE -->
-  <section id="codeSection" class="hidden">
+  <section id="codeSection" class="card hidden">
     <h2>Vérification</h2>
     <p>Entrez le code de validation (simulation)</p>
-    <p class="code-demo">Code généré : <span id="generatedCode"></span></p>
+    <p class="demo">Code généré : <span id="generatedCode"></span></p>
     <input type="text" id="codeInput" placeholder="Code">
     <button onclick="verifyCode()">Valider</button>
   </section>
 
   <!-- DASHBOARD -->
   <section id="dashboard" class="hidden">
-    <h2>Techniques d’attaques (approche défensive)</h2>
 
-    <div class="cards">
+    <h2 class="center">Techniques d’attaque – Vue éducative</h2>
+
+    <div class="grid">
       <div class="card">
         <h3>Phishing</h3>
         <p>
-          Le phishing repose sur l’imitation de services légitimes afin
-          d’inciter un utilisateur à divulguer des informations sensibles.
+          Technique visant à tromper un utilisateur via des messages imitant
+          des services légitimes afin d’obtenir des informations.
         </p>
       </div>
 
       <div class="card">
         <h3>Ingénierie sociale</h3>
         <p>
-          Manipulation psychologique exploitant la peur, l’urgence ou l’autorité
-          pour provoquer une action non réfléchie.
+          Exploitation des mécanismes psychologiques comme l’urgence,
+          la peur ou la confiance.
         </p>
       </div>
 
       <div class="card">
-        <h3>Fausses pages de connexion</h3>
+        <h3>Fausses interfaces</h3>
         <p>
-          Pages visuellement crédibles imitant des interfaces connues.
-          La prévention repose sur la vérification des URLs.
+          Pages visuellement crédibles destinées à induire en erreur.
+          La prévention repose sur la vigilance.
         </p>
       </div>
 
       <div class="card">
-        <h3>Vol de session</h3>
+        <h3>Compromission de session</h3>
         <p>
-          Exploitation de sessions actives via des appareils compromis
-          ou des réseaux non sécurisés.
+          Accès non autorisé à une session active via un appareil ou
+          un réseau non sécurisé.
         </p>
       </div>
     </div>
 
-    <h2>Contact</h2>
+    <!-- CONTACT -->
+    <h2 class="center">Contact</h2>
 
-    <form id="contactForm">
+    <form id="contactForm" class="card">
       <input type="text" name="name" placeholder="Nom" required>
       <input type="email" name="email" placeholder="Email" required>
       <textarea name="message" placeholder="Message" required></textarea>
@@ -76,23 +82,23 @@
       <input type="hidden" name="_captcha" value="false">
 
       <button type="submit">Envoyer</button>
+      <p id="status"></p>
     </form>
 
-    <p id="status"></p>
-
     <p class="legal">
-      ⚠️ Site strictement éducatif – aucune méthode illégale n’est enseignée.
+      ⚠️ Plateforme éducative – aucune méthode illégale n’est enseignée.
     </p>
+
   </section>
 
-</div>
+</main>
 
 <script src="script.js"></script>
 
-<!-- SCRIPT FORMULAIRE (TON SCRIPT EXACT) -->
+<!-- TON SCRIPT FORMULAIRE (INCHANGÉ) -->
 <script>
 document.getElementById("contactForm").addEventListener("submit", function(e) {
-  e.preventDefault(); // empêche la redirection
+  e.preventDefault();
 
   const formData = new FormData(this);
 

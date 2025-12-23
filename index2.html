@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Partager mon écran</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+        
+        .status {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+        
+        .status-indicator.inactive {
+            background: #dc3545;
+        }
+        
+        .status-indicator.active {
+            background: #28a745;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .room-code {
+            background: #667eea;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-size: 32px;
+            font-weight: bold;
+            letter-spacing: 5px;
+            font-family: 'Courier New', monospace;
+            display: none;
+        }
+        
+        .room-code.visible {
+            display: block;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 10px;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .preview {
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .preview.visible {
+            display: block;
+        }
+        
+        video {
+            width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .info {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 5px;
+            text-align: left;
+        }
+        
+        .info h3 {
+            color: #1976D2;
+            margin-bottom: 10px;
+        }
+        
+        .info p {
+            color: #555;
+            margin: 5px 0;
+            font-size: 14px;
+        }
+        
+        .viewer-count {
+            background: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📺 Partager mon écran</h1>
+        <p class="subtitle">Permettez à d'autres de voir votre écran en temps réel</p>
+        
+        <div class="status">
+            <span class="status-indicator inactive" id="statusDot"></span>
+            <span id="statusText">Pas de partage actif</span>
+        </div>
+        
+        <div class="room-code" id="roomCode"></div>
+        
+        <button id="startBtn" onclick="startSharing()">🚀 Commencer le partage</button>
+        <button id="stopBtn" onclick="stopSharing()" style="display:none; background: #dc3545;">⏹️ Arrêter le partage</button>
+        
+        <div class="preview" id="preview">
+            <h3>Aperçu de votre écran :</h3>
+            <video id="localVideo" autoplay muted></video>
+        </div>
+        
+        <div class="viewer-count" id="viewerCount" style="display:none;">
+            👥 <span id="count">0</span> personne(s) regardent
+        </div>
+        
+        <div class="info">
+            <h3>ℹ️ Comment ça fonctionne ?</h3>
+            <p><strong>1.</strong> Cliquez sur "Commencer le partage"</p>
+            <p><strong>2.</strong> Sélectionnez ce que vous voulez partager (écran entier, fenêtre, ou onglet)</p>
+            <p><strong>3.</strong> Partagez le code affiché avec la personne qui veut voir votre écran</p>
+            <p><strong>4.</strong> L'autre personne entre ce code sur la page de visualisation</p>
+            <p style="margin-top: 10px; color: #dc3545;"><strong>⚠️ Attention :</strong> Cette démo utilise un système simplifié. Dans cette version, les données sont stockées temporairement en mémoire.</p>
+        </div>
+    </div>
+    
+    <script>
+        let localStream = null;
+        let roomId = null;
+        let canvas = null;
+        let captureInterval = null;
+        
+        function generateRoomId() {
+            return Math.random().toString(36).substring(2, 8).toUpperCase();
+        }
+        
+        async function startSharing() {
+            try {
+                // Demander l'accès à l'écran
+                localStream = await navigator.mediaDevices.getDisplayMedia({
+                    video: {
+                        cursor: "always",
+                        displaySurface: "monitor"
+                    },
+                    audio: false
+                });
+                
+                // Générer un code de salle
+                roomId = generateRoomId();
+                
+                // Afficher le flux local
+                document.getElementById('localVideo').srcObject = localStream;
+                
+                // Mettre à jour l'interface
+                document.getElementById('startBtn').style.display = 'none';
+                document.getElementById('stopBtn').style.display = 'inline-block';
+                document.getElementById('preview').classList.add('visible');
+                document.getElementById('roomCode').classList.add('visible');
+                document.getElementById('roomCode').textContent = roomId;
+                document.getElementById('statusDot').classList.remove('inactive');
+                document.getElementById('statusDot').classList.add('active');
+                document.getElementById('statusText').textContent = '✅ Partage actif';
+                document.getElementById('viewerCount').style.display = 'inline-block';
+                
+                // Capturer et envoyer les frames
+                startCapture();
+                
+                // Détecter quand l'utilisateur arrête le partage
+                localStream.getVideoTracks()[0].onended = () => {
+                    stopSharing();
+                };
+                
+            } catch (err) {
+                alert('❌ Erreur : ' + err.message + '\n\nAssurez-vous d\'avoir autorisé le partage d\'écran.');
+                console.error('Erreur de partage:', err);
+            }
+        }
+        
+        function startCapture() {
+            canvas = document.createElement('canvas');
+            const video = document.getElementById('localVideo');
+            const ctx = canvas.getContext('2d');
+            
+            captureInterval = setInterval(() => {
+                if (video.videoWidth > 0) {
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    ctx.drawImage(video, 0, 0);
+                    
+                    // Convertir en base64 (qualité réduite pour la démo)
+                    const imageData = canvas.toDataURL('image/jpeg', 0.5);
+                    
+                    // Simuler l'envoi au serveur
+                    sendFrame(imageData);
+                }
+            }, 500); // Une frame toutes les 500ms (2 fps pour la démo)
+        }
+        
+        function sendFrame(imageData) {
+            // Dans une vraie app, tu enverrais ça à un serveur WebSocket ou WebRTC
+            // Ici on simule en stockant localement
+            const data = {
+                roomId: roomId,
+                frame: imageData,
+                timestamp: Date.now()
+            };
+            
+            // Stocker dans localStorage (temporaire pour la démo)
+            const storageData = JSON.parse(localStorage.getItem('screenShare') || '{}');
+            storageData[roomId] = data;
+            localStorage.setItem('screenShare', JSON.stringify(storageData));
+            
+            // Simuler un compteur de viewers
+            const viewers = Math.floor(Math.random() * 3);
+            document.getElementById('count').textContent = viewers;
+        }
+        
+        function stopSharing() {
+            if (localStream) {
+                localStream.getTracks().forEach(track => track.stop());
+                localStream = null;
+            }
+            
+            if (captureInterval) {
+                clearInterval(captureInterval);
+                captureInterval = null;
+            }
+            
+            // Nettoyer le stockage
+            if (roomId) {
+                const storageData = JSON.parse(localStorage.getItem('screenShare') || '{}');
+                delete storageData[roomId];
+                localStorage.setItem('screenShare', JSON.stringify(storageData));
+            }
+            
+            // Réinitialiser l'interface
+            document.getElementById('startBtn').style.display = 'inline-block';
+            document.getElementById('stopBtn').style.display = 'none';
+            document.getElementById('preview').classList.remove('visible');
+            document.getElementById('roomCode').classList.remove('visible');
+            document.getElementById('statusDot').classList.remove('active');
+            document.getElementById('statusDot').classList.add('inactive');
+            document.getElementById('statusText').textContent = 'Pas de partage actif';
+            document.getElementById('viewerCount').style.display = 'none';
+            document.getElementById('localVideo').srcObject = null;
+            
+            roomId = null;
+        }
+    </script>
+</body>
+</html>

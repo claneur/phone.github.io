@@ -91,11 +91,6 @@
       opacity: 0.9;
     }
 
-    button:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-
     .grid {
       display: grid;
       grid-template-columns: 1fr;
@@ -120,30 +115,6 @@
       font-size: 0.8em;
       color: #64748b;
       margin-top: 20px;
-    }
-
-    #status {
-      margin-top: 15px;
-      padding: 12px;
-      border-radius: 8px;
-      font-weight: bold;
-      display: none;
-    }
-
-    #status.show {
-      display: block;
-    }
-
-    #status.success {
-      background: #d1fae5;
-      color: #065f46;
-      border: 1px solid #6ee7b7;
-    }
-
-    #status.error {
-      background: #fee2e2;
-      color: #991b1b;
-      border: 1px solid #fca5a5;
     }
 
     /* TABLET & DESKTOP */
@@ -214,18 +185,18 @@
     <!-- CONTACT -->
     <h2>Contact</h2>
 
-    <form id="contactForm" class="card" action="https://api.web3forms.com/submit" method="POST">
+    <form action="https://api.web3forms.com/submit" method="POST" class="card">
       <input type="hidden" name="access_key" value="78c4e0bf-fe40-4669-9faf-2e46c98c8d90">
+      <input type="hidden" name="_subject" value="Nouveau message CyberAware">
+      <input type="hidden" name="_captcha" value="false">
       
       <input type="text" name="name" placeholder="Nom" required>
       <input type="email" name="email" placeholder="Email" required>
       <textarea name="message" placeholder="Message" required></textarea>
 
-      <input type="hidden" name="redirect" value="https://web3forms.com/success">
       <input type="checkbox" name="botcheck" style="display:none">
 
-      <button type="submit" id="submitBtn">Envoyer</button>
-      <div id="status"></div>
+      <button type="submit">Envoyer</button>
     </form>
 
     <p class="legal">
@@ -265,49 +236,6 @@
       alert("Code incorrect");
     }
   }
-
-  const form = document.getElementById('contactForm');
-  const statusDiv = document.getElementById('status');
-  const submitBtn = document.getElementById('submitBtn');
-
-  form.addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Envoi en cours...';
-    statusDiv.className = '';
-    statusDiv.textContent = '';
-
-    const formData = new FormData(form);
-
-    fetch('https://api.web3forms.com/submit', {
-      method: 'POST',
-      body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        statusDiv.textContent = '✅ Message envoyé avec succès !';
-        statusDiv.className = 'success show';
-        form.reset();
-        
-        setTimeout(() => {
-          statusDiv.className = '';
-          statusDiv.textContent = '';
-        }, 5000);
-      } else {
-        throw new Error('Erreur serveur');
-      }
-    })
-    .catch(error => {
-      statusDiv.textContent = '❌ Erreur lors de l\'envoi. Veuillez réessayer.';
-      statusDiv.className = 'error show';
-    })
-    .finally(() => {
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Envoyer';
-    });
-  });
 </script>
 
 </body>

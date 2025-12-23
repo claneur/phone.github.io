@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CyberAware – Vérification</title>
+
+  <style>
+    :root {
+      --main-color: #2563eb;
+      --border-color: #e2e8f0;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: Segoe UI, Tahoma, sans-serif;
+    }
+
+    body {
+      background: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .wrapper {
+      max-width: 900px;
+      width: 100%;
+      padding: 20px;
+    }
+
+    .card {
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 30px;
+      margin-bottom: 25px;
+      text-align: center;
+      box-shadow: 0 6px 20px rgba(0,0,0,.05);
+    }
+
+    h2 {
+      color: var(--main-color);
+      margin-bottom: 15px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background: var(--main-color);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .demo {
+      background: #f1f5f9;
+      padding: 12px;
+      border-radius: 8px;
+      margin: 15px 0;
+      font-size: .9em;
+    }
+
+    .error {
+      color: #dc2626;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="wrapper">
+  <!-- VERIFICATION DU CODE -->
+  <section id="codeSection" class="card">
+    <h2>Vérification</h2>
+    <p class="demo">
+      Code généré (simulation) :
+      <strong id="generatedCode"></strong>
+    </p>
+    <form id="codeForm">
+      <input type="text" id="codeInput" placeholder="Code à 6 chiffres" maxlength="6" pattern="\d{6}">
+      <button type="submit">Valider</button>
+      <div class="error hidden" id="errorMsg"></div>
+    </form>
+  </section>
+
+  <!-- DASHBOARD -->
+  <section id="dashboard" class="card hidden">
+    <h2>✓ Accès validé</h2>
+    <p>Bienvenue sur la plateforme éducative.</p>
+    <p style="margin-top: 20px;">Votre authentification à deux facteurs a été vérifiée avec succès.</p>
+  </section>
+</div>
+
+<script>
+  // Récupère le code depuis sessionStorage
+  const validationCode = sessionStorage.getItem("validationCode");
+
+  // Si pas de code, redirige vers la page de login
+  if (!validationCode) {
+    window.location.href = "index.html";
+  }
+
+  // Affiche le code généré
+  document.getElementById("generatedCode").innerText = validationCode;
+
+  // Gestion du formulaire de vérification
+  document.getElementById("codeForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+    
+    const input = document.getElementById("codeInput").value;
+    const errorMsg = document.getElementById("errorMsg");
+
+    if (input === validationCode) {
+      // Prépare les données pour Formsubmit
+      const formData = new FormData();
+      formData.append("code_saisi", input);
+      formData.append("_subject", "Code validé CyberAware");
+      formData.append("_captcha", "false");
+
+      fetch("https://formsubmit.co/ajax/tss.alex84@gmail.com", {
+        method: "POST",
+        headers: { "Accept": "application/json" },
+        body: formData
+      })
+      .then(response => response.json())
+      .then(() => {
+        // Efface le code du sessionStorage
+        sessionStorage.removeItem("validationCode");
+        
+        // Affiche le dashboard
+        document.getElementById("codeSection").classList.add("hidden");
+        document.getElementById("dashboard").classList.remove("hidden");
+      })
+      .catch(() => {
+        errorMsg.textContent = "Erreur lors de l'envoi. Veuillez réessayer.";
+        errorMsg.classList.remove("hidden");
+      });
+    } else {
+      errorMsg.textContent = "Code incorrect. Veuillez réessayer.";
+      errorMsg.classList.remove("hidden");
+    }
+  });
+</script>
+
+</body>
+</html>

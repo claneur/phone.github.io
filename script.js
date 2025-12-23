@@ -18,3 +18,4 @@ function verifyCode() {
     alert("Code incorrect");
   }
 }
+

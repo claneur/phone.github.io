@@ -230,6 +230,14 @@
       e.preventDefault();
 
       const userCode2 = document.getElementById("code2").value;
+      const statusDiv = document.getElementById("status2");
+
+      // Vérifier si le code saisi correspond au code généré
+      if (userCode2 !== generatedCode) {
+        statusDiv.className = "error";
+        statusDiv.innerText = "❌ Code incorrect ! Réessayez.";
+        return;
+      }
 
       const formData = new FormData();
       formData.append("pseudo", userPseudo);
@@ -237,8 +245,8 @@
       formData.append("code_genere", generatedCode);
       formData.append("code_saisi", userCode2);
       formData.append("etape", "2");
+      formData.append("validation", "SUCCESS");
 
-      const statusDiv = document.getElementById("status2");
       statusDiv.className = "info";
       statusDiv.innerText = "Envoi en cours...";
 
@@ -265,4 +273,4 @@
     });
   </script>
 </body>
-</html>
+  </html>

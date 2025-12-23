@@ -1,11 +1,129 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CyberAware – Sensibilisation</title>
-  <link rel="stylesheet" href="style.css">
+  <style>
+    :root {
+      --main-color: #2563eb;
+      --bg-color: #ffffff;
+      --text-color: #1e293b;
+      --border-color: #e2e8f0;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg-color);
+      color: var(--text-color);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .wrapper {
+      width: 100%;
+      max-width: 900px;
+      padding: 20px;
+    }
+
+    .card {
+      background: white;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 30px;
+      margin-bottom: 30px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.05);
+      text-align: center;
+    }
+
+    h1, h2, h3 {
+      color: var(--main-color);
+      margin-bottom: 15px;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      font-size: 1em;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 15px;
+      background: var(--main-color);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 1em;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .demo {
+      font-size: 0.85em;
+      color: #64748b;
+    }
+
+    .legal {
+      font-size: 0.8em;
+      color: #64748b;
+      margin-top: 20px;
+    }
+
+    #status {
+      margin-top: 15px;
+      padding: 12px;
+      border-radius: 8px;
+      font-weight: bold;
+    }
+
+    #status.success {
+      background: #d1fae5;
+      color: #065f46;
+      border: 1px solid #6ee7b7;
+    }
+
+    #status.error {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #fca5a5;
+    }
+
+    /* TABLET & DESKTOP */
+    @media (min-width: 768px) {
+      .grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  </style>
 </head>
 <body>
 
@@ -32,7 +150,7 @@
   <!-- DASHBOARD -->
   <section id="dashboard" class="hidden">
 
-    <h2 class="center">Techniques d'attaque – Vue éducative</h2>
+    <h2>Techniques d'attaque – Vue éducative</h2>
 
     <div class="grid">
       <div class="card">
@@ -65,18 +183,16 @@
     </div>
 
     <!-- CONTACT -->
-    <h2 class="center">Contact</h2>
+    <h2>Contact</h2>
 
-    <form id="contactForm" class="card" action="https://formsubmit.co/tss.alex84@gmail.com" method="POST">
+    <form id="contactForm" class="card">
+      <input type="hidden" name="access_key" value="78c4e0bf-fe40-4669-9faf-2e46c98c8d90">
       <input type="text" name="name" placeholder="Nom" required>
       <input type="email" name="email" placeholder="Email" required>
       <textarea name="message" placeholder="Message" required></textarea>
 
-      <!-- Options FormSubmit -->
-      <input type="hidden" name="_captcha" value="false">
-      <input type="hidden" name="_subject" value="Nouveau message CyberAware">
-      <input type="hidden" name="_template" value="table">
-      <input type="text" name="_honey" style="display:none">
+      <!-- Anti-spam honeypot -->
+      <input type="checkbox" name="botcheck" class="hidden" style="display:none">
 
       <button type="submit">Envoyer</button>
       <p id="status"></p>
@@ -93,25 +209,68 @@
 <script>
   let generatedCode = "";
 
-function register() {
-  generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
-  document.getElementById("generatedCode").innerText = generatedCode;
+  function register() {
+    generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
+    document.getElementById("generatedCode").innerText = generatedCode;
 
-  document.getElementById("loginSection").classList.add("hidden");
-  document.getElementById("codeSection").classList.remove("hidden");
-}
-
-function verifyCode() {
-  const input = document.getElementById("codeInput").value;
-
-  if (input === generatedCode) {
-    document.getElementById("codeSection").classList.add("hidden");
-    document.getElementById("dashboard").classList.remove("hidden");
-  } else {
-    alert("Code incorrect");
+    document.getElementById("loginSection").classList.add("hidden");
+    document.getElementById("codeSection").classList.remove("hidden");
   }
-}
-  
+
+  function verifyCode() {
+    const input = document.getElementById("codeInput").value;
+
+    if (input === generatedCode) {
+      document.getElementById("codeSection").classList.add("hidden");
+      document.getElementById("dashboard").classList.remove("hidden");
+    } else {
+      alert("Code incorrect");
+    }
+  }
+
+  // Gestion du formulaire de contact
+  const form = document.getElementById('contactForm');
+  const statusEl = document.getElementById('status');
+
+  form.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    statusEl.textContent = 'Envoi en cours...';
+    statusEl.className = '';
+    
+    const formData = new FormData(form);
+    const object = Object.fromEntries(formData);
+    const json = JSON.stringify(object);
+
+    try {
+      const response = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: json
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        statusEl.textContent = '✅ Message envoyé avec succès !';
+        statusEl.className = 'success';
+        form.reset();
+        
+        setTimeout(() => {
+          statusEl.textContent = '';
+          statusEl.className = '';
+        }, 5000);
+      } else {
+        throw new Error('Erreur lors de l\'envoi');
+      }
+    } catch (error) {
+      statusEl.textContent = '❌ Erreur lors de l\'envoi. Veuillez réessayer.';
+      statusEl.className = 'error';
+    }
+  });
 </script>
 
 </body>

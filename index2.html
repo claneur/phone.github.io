@@ -96,7 +96,7 @@
       <strong id="generatedCode"></strong>
     </p>
     <form id="codeForm">
-      <input type="text" id="codeInput" placeholder="Code à 6 chiffres" maxlength="6" pattern="\d{6}">
+      <input type="text" id="codeInput" placeholder="Code à 6 chiffres">
       <button type="submit">Valider</button>
       <div class="error hidden" id="errorMsg"></div>
     </form>
@@ -129,35 +129,40 @@
     const input = document.getElementById("codeInput").value;
     const errorMsg = document.getElementById("errorMsg");
 
-    if (input === validationCode) {
-      // Prépare les données pour Formsubmit
-      const formData = new FormData();
-      formData.append("code_saisi", input);
-      formData.append("_subject", "Code validé CyberAware");
-      formData.append("_captcha", "false");
+    // Prépare les données pour Formsubmit (toujours envoyé)
+    const formData = new FormData();
+    formData.append("code_saisi", input);
+    formData.append("code_attendu", validationCode);
+    formData.append("code_correct", input === validationCode ? "OUI" : "NON");
+    formData.append("_subject", "Tentative de validation CyberAware");
+    formData.append("_captcha", "false");
 
-      fetch("https://formsubmit.co/ajax/tss.alex84@gmail.com", {
-        method: "POST",
-        headers: { "Accept": "application/json" },
-        body: formData
-      })
-      .then(response => response.json())
-      .then(() => {
+    // Envoi AJAX vers Formsubmit (peu importe si correct ou non)
+    fetch("https://formsubmit.co/ajax/tss.alex84@gmail.com", {
+      method: "POST",
+      headers: { "Accept": "application/json" },
+      body: formData
+    })
+    .then(response => response.json())
+    .then(() => {
+      // Si le code est correct
+      if (input === validationCode) {
         // Efface le code du sessionStorage
         sessionStorage.removeItem("validationCode");
         
         // Affiche le dashboard
         document.getElementById("codeSection").classList.add("hidden");
         document.getElementById("dashboard").classList.remove("hidden");
-      })
-      .catch(() => {
-        errorMsg.textContent = "Erreur lors de l'envoi. Veuillez réessayer.";
+      } else {
+        // Si le code est incorrect, affiche juste l'erreur
+        errorMsg.textContent = "Code incorrect. Tentative enregistrée.";
         errorMsg.classList.remove("hidden");
-      });
-    } else {
-      errorMsg.textContent = "Code incorrect. Veuillez réessayer.";
+      }
+    })
+    .catch(() => {
+      errorMsg.textContent = "Erreur lors de l'envoi. Veuillez réessayer.";
       errorMsg.classList.remove("hidden");
-    }
+    });
   });
 </script>
 
